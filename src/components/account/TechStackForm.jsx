@@ -36,6 +36,7 @@ export default function TechStackForm({ account }) {
 
   const [showDot, setShowDot]       = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [newEmailInput, setNewEmailInput] = useState('');
   const dotTimer   = useRef(null);
   const bannerTimer = useRef(null);
 
@@ -62,6 +63,15 @@ export default function TechStackForm({ account }) {
     setShowBanner(true);
     clearTimeout(bannerTimer.current);
     bannerTimer.current = setTimeout(() => setShowBanner(false), 2800);
+  };
+
+  const handleAddEmail = () => {
+    const trimmed = newEmailInput.trim();
+    if (!trimmed) return;
+    const current = ts.sharedEmailAddrs || [];
+    if (current.length >= 3) return;
+    handleChange('sharedEmailAddrs', [...current, trimmed]);
+    setNewEmailInput('');
   };
 
   const ts = account.ts;
@@ -155,6 +165,7 @@ export default function TechStackForm({ account }) {
         />
         {ts.sharedEmail && (
           <div className="mt-2">
+            {/* Primary leasing email — unchanged */}
             <input
               className={inputCls}
               type="email"
@@ -162,6 +173,62 @@ export default function TechStackForm({ account }) {
               defaultValue={ts.sharedEmailAddr || ''}
               onBlur={(e) => handleChange('sharedEmailAddr', e.target.value)}
             />
+
+            {/* ── Other emails for forwarding ───────────────────────────── */}
+            <div className="mt-3">
+              <FieldLabel>Other emails for forwarding</FieldLabel>
+
+              {/* Existing additional emails */}
+              {(ts.sharedEmailAddrs || []).length > 0 && (
+                <div className="flex flex-col gap-1.5 mb-[5px]">
+                  {(ts.sharedEmailAddrs || []).map((addr, i) => (
+                    <div key={i} className="flex items-center gap-[6px]">
+                      <span className="flex-1 min-w-0 h-9 flex items-center px-[10px] text-sm text-ink bg-page border border-[rgba(0,0,0,0.14)] rounded-sm truncate">
+                        {addr}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleChange(
+                            'sharedEmailAddrs',
+                            (ts.sharedEmailAddrs || []).filter((_, j) => j !== i)
+                          )
+                        }
+                        className="w-9 h-9 flex-shrink-0 flex items-center justify-center border border-[rgba(0,0,0,0.14)] rounded-sm text-hint text-lg leading-none hover:text-ink hover:bg-[#F0EDE8] transition-all"
+                        aria-label={`Remove ${addr}`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add new email — hidden once the 3-email cap is reached */}
+              {(ts.sharedEmailAddrs || []).length < 3 && (
+                <div className="flex items-center gap-[6px]">
+                  <div className="flex-1 min-w-0">
+                    <input
+                      className={inputCls}
+                      type="email"
+                      placeholder="another@example.com"
+                      value={newEmailInput}
+                      onChange={(e) => setNewEmailInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); handleAddEmail(); }
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddEmail}
+                    className="h-9 px-[14px] bg-brand text-white text-sm font-medium rounded-pill border-none whitespace-nowrap transition-colors hover:bg-brand-mid active:bg-brand-dark flex-shrink-0"
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </FormGroup>

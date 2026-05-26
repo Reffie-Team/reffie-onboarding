@@ -71,7 +71,9 @@ export function generateSteps(ts) {
   }
 
   if (ts.sharedEmail) {
-    const suffix = ts.sharedEmailAddr ? ` — ${ts.sharedEmailAddr}` : '';
+    const allAddrs = [ts.sharedEmailAddr, ...(ts.sharedEmailAddrs || [])]
+      .filter(Boolean);
+    const suffix = allAddrs.length > 0 ? ` — ${allAddrs.join(', ')}` : '';
     add('Kick-off call', 'email', `[Shared leasing email forwarding setup${suffix} — instructions TBD]`);
   }
 
@@ -145,7 +147,8 @@ export function syncChecklist(checklist, steps) {
 export function getProgress(account) {
   const steps = generateSteps(account.ts);
   const stageSteps = steps.filter((s) => s.stage === account.stage);
-  const done = stageSteps.filter((s) => account.cl[s.id]?.done).length;
+  const cl = account.cl ?? {};
+  const done = stageSteps.filter((s) => cl[s.id]?.done === true).length;
   const total = stageSteps.length;
   return { done, total, pct: total ? done / total : 0 };
 }

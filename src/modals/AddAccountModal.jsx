@@ -12,6 +12,7 @@ const DEFAULT_TS = {
   facebook: false,
   sharedEmail: false,
   sharedEmailAddr: '',
+  sharedEmailAddrs: [],
   other: '',
 };
 

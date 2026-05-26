@@ -11,7 +11,7 @@ import StepCheckbox from '@/components/ui/StepCheckbox';
  *  - Sub-item indentation with left green bar
  */
 export default function StepItem({ step, state, onToggle, onSaveNote }) {
-  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(!!state.note);
   const textareaRef = useRef(null);
 
   const isPlaceholder = step.text.startsWith('[');

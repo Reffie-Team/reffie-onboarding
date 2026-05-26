@@ -82,7 +82,8 @@ const useAccountStore = create(
 
       /**
        * toggleStep — flip a step done/undone. Auto-advances stage when all
-       * steps in the current stage are complete.
+       * steps in the current stage are complete. Auto-reverses to the earliest
+       * stage with incomplete steps when a previously-completed step is unchecked.
        *
        * Returns:
        *   { advanced: true,  newStage: string }  — stage moved forward
@@ -122,6 +123,22 @@ const useAccountStore = create(
             } else {
               // Last stage (60-day) — onboarding complete
               result = { advanced: false, completed: true };
+            }
+          } else {
+            // ── Backward reversal ─────────────────────────────────────────────
+            // If a step was unchecked and a stage earlier than the current one
+            // now has at least one incomplete step, reverse to the earliest such
+            // stage. This ensures the stage always reflects the earliest
+            // outstanding work.
+            const currentIdx = STAGES.indexOf(account.stage);
+            const earliestIncompleteIdx = STAGES.findIndex((stage, i) => {
+              if (i >= currentIdx) return false; // only look before current stage
+              const ss = steps.filter((s) => s.stage === stage);
+              return ss.length > 0 && ss.some((s) => !newCl[s.id]?.done);
+            });
+
+            if (earliestIncompleteIdx !== -1) {
+              updated = { ...updated, stage: STAGES[earliestIncompleteIdx] };
             }
           }
 
