@@ -1,0 +1,182 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { PMS_OPTIONS, TOUR_OPTIONS, APPLICATIONS_OPTIONS, ZILLOW_OPTIONS } from '@/lib/constants';
+import { generateSteps } from '@/lib/stepsEngine';
+import Toggle from '@/components/ui/Toggle';
+import useAccountStore from '@/store/useAccountStore';
+
+function FieldLabel({ children }) {
+  return <label className="text-xs font-semibold text-ink mb-[5px] block">{children}</label>;
+}
+
+function FormGroup({ children }) {
+  return <div className="mb-[13px] last:mb-0">{children}</div>;
+}
+
+const selectCls = `w-full h-9 px-[10px] border border-[rgba(0,0,0,0.14)] rounded-sm
+  bg-white font-[family:inherit] text-sm text-ink outline-none cursor-pointer block
+  hover:border-[rgba(0,0,0,0.25)] focus:border-brand focus:shadow-focus transition-all`;
+
+const inputCls = `w-full h-9 px-[10px] border border-[rgba(0,0,0,0.14)] rounded-sm
+  bg-page font-[family:inherit] text-sm text-ink outline-none block
+  placeholder:text-hint
+  hover:border-[rgba(0,0,0,0.25)] focus:border-brand focus:shadow-focus transition-all`;
+
+/**
+ * TechStackForm
+ *
+ * Editable tech stack card. When any field changes:
+ *  - Calls updateTechStack in the store (which re-derives + syncs the checklist)
+ *  - Shows amber "update dot" for 2s
+ *  - Shows "Checklist regenerated" banner for 2.8s
+ *
+ * Mirrors prototype's onTs() + udot + rbn behavior exactly.
+ */
+export default function TechStackForm({ account }) {
+  const updateTechStack = useAccountStore((s) => s.updateTechStack);
+
+  const [showDot, setShowDot]       = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
+  const dotTimer   = useRef(null);
+  const bannerTimer = useRef(null);
+
+  // Stable reference to current steps IDs for detecting actual step changes
+  const prevStepIds = useRef(
+    new Set(generateSteps(account.ts).map((s) => s.id))
+  );
+
+  // Sync prevStepIds whenever account.ts changes externally
+  useEffect(() => {
+    prevStepIds.current = new Set(generateSteps(account.ts).map((s) => s.id));
+  }, [account.ts]);
+
+  const handleChange = (field, value) => {
+    const changed = updateTechStack(account.id, field, value);
+    if (!changed) return;
+
+    // Amber dot — flashes on any ts change
+    setShowDot(true);
+    clearTimeout(dotTimer.current);
+    dotTimer.current = setTimeout(() => setShowDot(false), 2000);
+
+    // Banner — shows on any ts change (mirrors prototype: shows whenever steps sync runs)
+    setShowBanner(true);
+    clearTimeout(bannerTimer.current);
+    bannerTimer.current = setTimeout(() => setShowBanner(false), 2800);
+  };
+
+  const ts = account.ts;
+
+  return (
+    <div className="bg-surface border border-[rgba(0,0,0,0.08)] rounded-md p-[20px_22px]">
+      {/* Card header */}
+      <div className="flex items-center mb-[14px]">
+        <span className="text-[11px] font-semibold uppercase tracking-[1.5px] text-brand">
+          Tech stack
+        </span>
+        {/* Amber update dot */}
+        <span
+          className="w-[6px] h-[6px] rounded-full bg-amber ml-[5px] align-middle transition-opacity duration-200"
+          style={{ opacity: showDot ? 1 : 0, display: 'inline-block', verticalAlign: 'middle' }}
+        />
+      </div>
+
+      {/* Regenerated banner */}
+      <div
+        className={`bg-brand-tint border border-[rgba(16,189,145,0.28)] rounded-sm px-[11px] py-[7px]
+          text-xs text-brand-dark font-medium flex items-center gap-[5px]
+          overflow-hidden transition-all duration-300
+          ${showBanner ? 'opacity-100 max-h-9 mb-3' : 'opacity-0 max-h-0 mb-0'}`}
+      >
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+          <path d="M2 8a6 6 0 1112 0 6 6 0 01-12 0z" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M8 5v3.5L10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+        Checklist regenerated
+      </div>
+
+      {/* PMS */}
+      <FormGroup>
+        <FieldLabel>PMS system</FieldLabel>
+        <select className={selectCls} value={ts.pms} onChange={(e) => handleChange('pms', e.target.value)}>
+          {PMS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+        </select>
+      </FormGroup>
+
+      {/* Tour scheduling */}
+      <FormGroup>
+        <FieldLabel>Tour scheduling platform</FieldLabel>
+        <select className={selectCls} value={ts.tour} onChange={(e) => handleChange('tour', e.target.value)}>
+          {TOUR_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+        </select>
+      </FormGroup>
+
+      {/* Lockboxes — conditional on tour */}
+      {ts.tour && ts.tour !== 'None' && (
+        <FormGroup>
+          <Toggle
+            checked={ts.lockboxes}
+            onChange={(v) => handleChange('lockboxes', v)}
+            label="Uses lockboxes?"
+          />
+        </FormGroup>
+      )}
+
+      {/* Applications */}
+      <FormGroup>
+        <FieldLabel>Applications platform</FieldLabel>
+        <select className={selectCls} value={ts.applications} onChange={(e) => handleChange('applications', e.target.value)}>
+          {APPLICATIONS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+        </select>
+      </FormGroup>
+
+      {/* Zillow */}
+      <FormGroup>
+        <FieldLabel>Zillow tier</FieldLabel>
+        <select className={selectCls} value={ts.zillow} onChange={(e) => handleChange('zillow', e.target.value)}>
+          {ZILLOW_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+        </select>
+      </FormGroup>
+
+      {/* Facebook */}
+      <FormGroup>
+        <Toggle
+          checked={ts.facebook}
+          onChange={(v) => handleChange('facebook', v)}
+          label="Facebook Marketplace"
+        />
+      </FormGroup>
+
+      {/* Shared leasing email */}
+      <FormGroup>
+        <Toggle
+          checked={ts.sharedEmail}
+          onChange={(v) => handleChange('sharedEmail', v)}
+          label="Shared leasing email?"
+        />
+        {ts.sharedEmail && (
+          <div className="mt-2">
+            <input
+              className={inputCls}
+              type="email"
+              placeholder="leasing@example.com"
+              defaultValue={ts.sharedEmailAddr || ''}
+              onBlur={(e) => handleChange('sharedEmailAddr', e.target.value)}
+            />
+          </div>
+        )}
+      </FormGroup>
+
+      {/* Other tools */}
+      <FormGroup>
+        <FieldLabel>Other tools</FieldLabel>
+        <input
+          className={inputCls}
+          type="text"
+          placeholder="e.g. Knock CRM, Rent Café…"
+          defaultValue={ts.other || ''}
+          onBlur={(e) => handleChange('other', e.target.value)}
+        />
+      </FormGroup>
+    </div>
+  );
+}

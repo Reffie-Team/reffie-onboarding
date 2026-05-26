@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base resets ─────────────────────────────────────────────────────────── */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans bg-page text-ink text-md leading-relaxed;
+  }
+
+  button {
+    font-family: inherit;
+  }
+}
+
+/* ─── Scrollbar styling ───────────────────────────────────────────────────── */
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d8d4ce;
+    border-radius: 99px;
+  }
+}
+
+/* ─── Focus-ring utility (shared across inputs, checkboxes, selects) ──────── */
+
+@layer utilities {
+  .focus-ring {
+    @apply outline-none focus:border-brand focus:shadow-focus;
+  }
+
+  /* Progress bar spring animation */
+  .progress-bar {
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+/* ─── Reusable component layer ────────────────────────────────────────────── */
+
+@layer components {
+  /* Eyebrow label — 11px, 600, uppercase, brand green */
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-widest text-brand block;
+  }
+
+  /* Page title */
+  .page-title {
+    @apply text-xl font-bold tracking-tight;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+  /* Primary pill button */
+  .btn-primary {
+    @apply h-9 px-[18px] bg-brand text-white text-sm font-medium
+           rounded-pill border-none whitespace-nowrap
+           transition-colors duration-150
+           hover:bg-brand-mid active:bg-brand-dark active:scale-[0.98];
+  }
+
+  /* Secondary pill button (back / ghost) */
+  .btn-secondary {
+    @apply inline-flex items-center gap-1.5 h-9 px-[14px]
+           bg-transparent text-muted text-sm font-medium
+           border border-[rgba(0,0,0,0.14)] rounded-pill
+           transition-all duration-150
+           hover:bg-[#F0EDE8] hover:text-ink hover:border-[rgba(0,0,0,0.22)];
+  }
+
+  /* ── Cards ───────────────────────────────────────────────────────────────── */
+
+  /* Standard card — 12px radius, 1px border, no shadow */
+  .card {
+    @apply bg-surface border border-[rgba(0,0,0,0.08)] rounded-md p-5;
+  }
+
+  /* Table wrapper card — 16px radius */
+  .table-card {
+    @apply bg-surface border border-[rgba(0,0,0,0.08)] rounded-lg overflow-hidden;
+  }
+
+  /* ── Badges ──────────────────────────────────────────────────────────────── */
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5
+           rounded-pill text-xs font-semibold whitespace-nowrap;
+  }
+  .badge-green  { @apply bg-brand-tint text-brand-dark; }
+  .badge-amber  { @apply bg-[#FEF7E0] text-[#8A5D04]; }
+  .badge-blue   { @apply bg-[#EEF3FF] text-[#3253C3]; }
+  .badge-gray   { @apply bg-[#F0EDE8] text-[#5A5650]; }
+
+  /* Dot inside badge */
+  .badge-dot {
+    @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+  }
+  .badge-green  .badge-dot { @apply bg-brand; }
+  .badge-amber  .badge-dot { @apply bg-amber; }
+  .badge-blue   .badge-dot { @apply bg-[#3253C3]; }
+  .badge-gray   .badge-dot { @apply bg-[#9A9590]; }
+
+  /* ── Form elements ───────────────────────────────────────────────────────── */
+
+  /* Text input */
+  .form-input {
+    @apply w-full h-9 px-2.5 bg-page text-ink text-sm
+           border border-[rgba(0,0,0,0.14)] rounded-sm
+           outline-none block
+           transition-all duration-150
+           hover:border-[rgba(0,0,0,0.25)]
+           focus:border-brand focus:shadow-focus
+           placeholder:text-hint;
+  }
+
+  /* Select (native) */
+  .form-select {
+    @apply w-full h-9 px-2.5 bg-white text-ink text-sm
+           border border-[rgba(0,0,0,0.14)] rounded-sm
+           outline-none cursor-pointer block
+           transition-all duration-150
+           hover:border-[rgba(0,0,0,0.25)]
+           focus:border-brand focus:shadow-focus;
+  }
+
+  /* Filter bar search pill */
+  .filter-search {
+    @apply w-full h-[34px] pl-8 pr-3 bg-white text-ink text-sm
+           border border-[rgba(0,0,0,0.14)] rounded-pill
+           outline-none
+           transition-all duration-150
+           placeholder:text-hint
+           focus:border-brand focus:shadow-focus;
+  }
+
+  /* Filter bar select (smaller, 8px radius) */
+  .filter-select {
+    @apply h-[34px] px-2.5 bg-white text-ink text-sm font-medium
+           border border-[rgba(0,0,0,0.14)] rounded-sm
+           outline-none cursor-pointer
+           transition-all duration-150
+           hover:border-[rgba(0,0,0,0.25)]
+           focus:border-brand focus:shadow-focus;
+  }
+
+  /* ── Table ───────────────────────────────────────────────────────────────── */
+
+  .th {
+    @apply px-[18px] py-[11px] text-left text-xs font-semibold
+           uppercase tracking-[0.5px] text-white whitespace-nowrap
+           cursor-pointer select-none bg-brand
+           transition-colors duration-150
+           hover:bg-brand-dark;
+  }
+  .th-sorted { @apply bg-brand-dark; }
+
+  .td {
+    @apply px-[18px] py-[14px] text-base align-middle;
+  }
+
+  .tr-body {
+    @apply border-b border-[rgba(0,0,0,0.08)] cursor-pointer
+           transition-colors duration-[120ms]
+           hover:bg-brand-tint
+           last:border-b-0;
+  }
+}
+
+/* ─── Detail page responsive grid ────────────────────────────────────────── */
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 1000px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Stat grid responsive ───────────────────────────────────────────────── */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1000px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
