@@ -45,7 +45,7 @@ const useAccountStore = create(
       addAccount: (draft) => {
         const steps = generateSteps(draft.ts);
         const cl = syncChecklist({}, steps);
-        const account = { ...draft, id: generateId(), cl };
+        const account = { ...draft, id: generateId(), cl, skippedStages: [] };
         set((s) => ({ accounts: [...s.accounts, account] }));
         return account.id;
       },
@@ -114,25 +114,31 @@ const useAccountStore = create(
 
           if (allCurrentDone) {
             const idx = STAGES.indexOf(account.stage);
-            if (idx < STAGES.length - 1) {
-              // Advance to next stage
-              const newStage = STAGES[idx + 1];
+            const skipped = account.skippedStages ?? [];
+            let nextIdx = idx + 1;
+            while (nextIdx < STAGES.length && skipped.includes(STAGES[nextIdx])) {
+              nextIdx++;
+            }
+            if (nextIdx < STAGES.length) {
+              // Advance to next non-skipped stage
+              const newStage = STAGES[nextIdx];
               const synced = syncChecklist(newCl, steps);
               updated = { ...updated, stage: newStage, cl: synced };
               result = { advanced: true, newStage };
             } else {
-              // Last stage (60-day) — onboarding complete
+              // Last stage (or all remaining are skipped) — onboarding complete
               result = { advanced: false, completed: true };
             }
           } else {
             // ── Backward reversal ─────────────────────────────────────────────
             // If a step was unchecked and a stage earlier than the current one
             // now has at least one incomplete step, reverse to the earliest such
-            // stage. This ensures the stage always reflects the earliest
-            // outstanding work.
+            // stage. Skipped stages are ignored.
             const currentIdx = STAGES.indexOf(account.stage);
+            const skippedBack = account.skippedStages ?? [];
             const earliestIncompleteIdx = STAGES.findIndex((stage, i) => {
               if (i >= currentIdx) return false; // only look before current stage
+              if (skippedBack.includes(stage)) return false;
               const ss = steps.filter((s) => s.stage === stage);
               return ss.length > 0 && ss.some((s) => !newCl[s.id]?.done);
             });
@@ -162,6 +168,41 @@ const useAccountStore = create(
             accounts: s.accounts.map((a) =>
               a.id === id
                 ? { ...a, cl: { ...a.cl, [stepId]: { ...existing, note } } }
+                : a
+            ),
+          };
+        }),
+
+      /**
+       * toggleSkipStage — mark/unmark a stage as not required for this account.
+       * When skipping the current stage, auto-advances to the next non-skipped stage.
+       * Skipped stages are ignored during auto-advance and backward reversal.
+       */
+      toggleSkipStage: (id, stageName) =>
+        set((s) => {
+          const account = s.accounts.find((a) => a.id === id);
+          if (!account) return {};
+
+          const skipped = account.skippedStages ?? [];
+          const isCurrentlySkipped = skipped.includes(stageName);
+          const newSkipped = isCurrentlySkipped
+            ? skipped.filter((st) => st !== stageName)
+            : [...skipped, stageName];
+
+          let newStage = account.stage;
+          if (!isCurrentlySkipped && account.stage === stageName) {
+            const idx = STAGES.indexOf(stageName);
+            let nextIdx = idx + 1;
+            while (nextIdx < STAGES.length && newSkipped.includes(STAGES[nextIdx])) {
+              nextIdx++;
+            }
+            if (nextIdx < STAGES.length) newStage = STAGES[nextIdx];
+          }
+
+          return {
+            accounts: s.accounts.map((a) =>
+              a.id === id
+                ? { ...a, skippedStages: newSkipped, stage: newStage }
                 : a
             ),
           };

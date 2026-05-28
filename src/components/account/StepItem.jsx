@@ -48,7 +48,7 @@ export default function StepItem({ step, state, onToggle, onSaveNote }) {
         {/* Step text + note chip */}
         <div
           className={[
-            'text-sm leading-relaxed',
+            'text-sm leading-relaxed whitespace-pre-wrap',
             state.done ? 'line-through text-hint' : '',
             isPlaceholder && !state.done ? 'italic text-hint' : 'text-ink',
           ].join(' ')}

@@ -28,8 +28,9 @@ export default function AccountDetail() {
 
   // Subscribe to the specific account (re-renders on any account mutation)
   const account = useAccountStore((s) => s.accounts.find((a) => a.id === id) ?? null);
-  const toggleStep = useAccountStore((s) => s.toggleStep);
-  const saveNote   = useAccountStore((s) => s.saveNote);
+  const toggleStep      = useAccountStore((s) => s.toggleStep);
+  const saveNote        = useAccountStore((s) => s.saveNote);
+  const toggleSkipStage = useAccountStore((s) => s.toggleSkipStage);
 
   // Track the most-recently unlocked stage so Checklist can force it open
   const [newlyUnlocked, setNewlyUnlocked] = useState(null);
@@ -52,6 +53,11 @@ export default function AccountDetail() {
   const handleSaveNote = useCallback(
     (stepId, note) => saveNote(id, stepId, note),
     [id, saveNote]
+  );
+
+  const handleToggleSkip = useCallback(
+    (stageName) => toggleSkipStage(id, stageName),
+    [id, toggleSkipStage]
   );
 
   if (!account) {
@@ -113,6 +119,7 @@ export default function AccountDetail() {
             onToggleStep={handleToggleStep}
             onSaveNote={handleSaveNote}
             newlyUnlocked={newlyUnlocked}
+            onToggleSkip={handleToggleSkip}
           />
         </div>
       </div>

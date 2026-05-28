@@ -42,7 +42,10 @@ export function generateSteps(ts) {
 
   // ── Kick-off call — conditional on tech stack ─────────────────────────────
   if (ts.pms) {
-    add('Kick-off call', 'pms', `[${ts.pms} integration step — instructions TBD]`);
+    const pmsText = ts.pms === 'Resman'
+      ? 'Resman Ingestion Setup:\n1. Go to the section labeled Reporting\n2. Select Custom Report\n3. In the section, start typing "New prospect" and select this as the report type\n4. In the report builder, set multiple send times for this report\n5. Use the Reffie ingestion email as the recipient for each send\n6. Add a report to send every 30 minutes from 12:00am to 11:30pm'
+      : `[${ts.pms} integration step — instructions TBD]`;
+    add('Kick-off call', 'pms', pmsText);
   }
 
   if (ts.tour && ts.tour !== 'None') {
@@ -61,13 +64,13 @@ export function generateSteps(ts) {
   }
 
   if (ts.zillow === 'Paid') {
-    add('Kick-off call', 'zillow', '[Zillow paid — webhook connection step — instructions TBD]');
+    add('Kick-off call', 'zillow', `Zillow Webhook Setup:\n1. Confirm the email connected to the client's Zillow account\n2. Email rentalfeeds@zillow.com with the following — CC Daniel, he will send the endpoint once Zillow responds:\n   "Hi, we need another custom webhook. This time for [COMPANY NAME]. I've CCed [CLIENT NAME] who owns the account under [email associated with account]. Let us know when you're ready and our CTO will send over the endpoint."\n3. Once Zillow replies and says they are ready, Daniel sends the endpoint: https://webhooks.reffie.me/zillow/team/[TEAM ID]\n   Example: https://webhooks.reffie.me/zillow/team/172`);
   } else if (ts.zillow === 'Free') {
     add('Kick-off call', 'zillow', '[Zillow free — email forwarding setup step — instructions TBD]');
   }
 
   if (ts.facebook) {
-    add('Kick-off call', 'fb', '[Facebook Marketplace integration step — instructions TBD]');
+    add('Kick-off call', 'fb', 'Facebook Marketplace integration — follow the setup guide here: https://reffie.tawk.help/article/facebook-integration-v1-beta-cookies-setup');
   }
 
   if (ts.sharedEmail) {

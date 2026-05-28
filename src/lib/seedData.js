@@ -126,7 +126,7 @@ const RAW_ACCOUNTS = [
 // Attach seeded checklist state to every account
 export const SEED_ACCOUNTS = RAW_ACCOUNTS.map((acc) => {
   const cl = seedChecklist(acc);
-  return { ...acc, cl };
+  return { ...acc, cl, skippedStages: [] };
 });
 
 // Special override for acc-1: partial kick-off progress (mirrors prototype)

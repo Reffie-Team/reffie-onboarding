@@ -17,7 +17,7 @@ import StageBlock from './StageBlock';
  * @param {function} onSaveNote     - (stepId, note) => void
  * @param {string}   [newlyUnlocked] - stage name to force-open after auto-advance
  */
-export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlocked }) {
+export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlocked, onToggleSkip }) {
   const si = STAGES.indexOf(account.stage);
 
   // Initialize: stages 0..si open, rest closed.
@@ -55,6 +55,7 @@ export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlo
 
   const steps = generateSteps(account.ts);
   const { done: totalDone, total } = { done: steps.filter(s => account.cl[s.id]?.done).length, total: steps.length };
+  const skippedStages = account.skippedStages ?? [];
 
   return (
     <div className="bg-surface border border-[rgba(0,0,0,0.08)] rounded-md p-[20px_22px]">
@@ -82,6 +83,8 @@ export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlo
               onToggle={() => toggle(stage)}
               onToggleStep={onToggleStep}
               onSaveNote={onSaveNote}
+              isSkipped={skippedStages.includes(stage)}
+              onToggleSkip={onToggleSkip ? () => onToggleSkip(stage) : undefined}
             />
           );
         })}
