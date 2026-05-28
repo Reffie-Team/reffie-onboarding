@@ -110,6 +110,9 @@ export default function TechStackForm({ account }) {
         <select className={selectCls} value={ts.pms} onChange={(e) => handleChange('pms', e.target.value)}>
           {PMS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
         </select>
+        <p className="mt-1 text-xs text-red-600 leading-snug">
+          If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
+        </p>
       </FormGroup>
 
       {/* Tour scheduling */}
@@ -118,6 +121,9 @@ export default function TechStackForm({ account }) {
         <select className={selectCls} value={ts.tour} onChange={(e) => handleChange('tour', e.target.value)}>
           {TOUR_OPTIONS.map((o) => <option key={o}>{o}</option>)}
         </select>
+        <p className="mt-1 text-xs text-red-600 leading-snug">
+          If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
+        </p>
       </FormGroup>
 
       {/* Lockboxes — conditional on tour */}
@@ -137,6 +143,9 @@ export default function TechStackForm({ account }) {
         <select className={selectCls} value={ts.applications} onChange={(e) => handleChange('applications', e.target.value)}>
           {APPLICATIONS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
         </select>
+        <p className="mt-1 text-xs text-red-600 leading-snug">
+          If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
+        </p>
       </FormGroup>
 
       {/* Zillow */}

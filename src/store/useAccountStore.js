@@ -45,7 +45,7 @@ const useAccountStore = create(
       addAccount: (draft) => {
         const steps = generateSteps(draft.ts);
         const cl = syncChecklist({}, steps);
-        const account = { ...draft, id: generateId(), cl, skippedStages: [] };
+        const account = { ...draft, id: generateId(), cl, skippedStages: [], pocs: draft.pocs ?? [] };
         set((s) => ({ accounts: [...s.accounts, account] }));
         return account.id;
       },
@@ -203,6 +203,53 @@ const useAccountStore = create(
             accounts: s.accounts.map((a) =>
               a.id === id
                 ? { ...a, skippedStages: newSkipped, stage: newStage }
+                : a
+            ),
+          };
+        }),
+
+      // ── POC mutations ────────────────────────────────────────────────────────
+
+      addPoc: (accountId) =>
+        set((s) => {
+          const account = s.accounts.find((a) => a.id === accountId);
+          if (!account) return {};
+          const newPoc = { id: generateId(), name: '', role: '', inviteSent: false };
+          return {
+            accounts: s.accounts.map((a) =>
+              a.id === accountId
+                ? { ...a, pocs: [...(a.pocs ?? []), newPoc] }
+                : a
+            ),
+          };
+        }),
+
+      updatePoc: (accountId, pocId, field, value) =>
+        set((s) => {
+          const account = s.accounts.find((a) => a.id === accountId);
+          if (!account) return {};
+          return {
+            accounts: s.accounts.map((a) =>
+              a.id === accountId
+                ? {
+                    ...a,
+                    pocs: (a.pocs ?? []).map((p) =>
+                      p.id === pocId ? { ...p, [field]: value } : p
+                    ),
+                  }
+                : a
+            ),
+          };
+        }),
+
+      removePoc: (accountId, pocId) =>
+        set((s) => {
+          const account = s.accounts.find((a) => a.id === accountId);
+          if (!account) return {};
+          return {
+            accounts: s.accounts.map((a) =>
+              a.id === accountId
+                ? { ...a, pocs: (a.pocs ?? []).filter((p) => p.id !== pocId) }
                 : a
             ),
           };

@@ -125,6 +125,7 @@ export default function AddAccountModal({ open, onClose }) {
       rep:      form.rep.trim(),
       stage:    STAGES[0],   // Pre-kick off
       ts:       DEFAULT_TS,
+      pocs:     [],
     });
 
     onClose();

@@ -8,6 +8,7 @@ import { useToast } from '@/components/layout/Toast';
 
 import StageStepper from '@/components/account/StageStepper';
 import InfoCard from '@/components/account/InfoCard';
+import MainPocsCard from '@/components/account/MainPocsCard';
 import TechStackForm from '@/components/account/TechStackForm';
 import Checklist from '@/components/account/Checklist';
 
@@ -106,9 +107,10 @@ export default function AccountDetail() {
 
       {/* Two-column grid */}
       <div className="detail-grid">
-        {/* Left column: info + tech stack */}
+        {/* Left column: info + pocs + tech stack */}
         <div>
           <InfoCard account={account} />
+          <MainPocsCard account={account} />
           <TechStackForm account={account} />
         </div>
 

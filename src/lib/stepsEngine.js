@@ -49,7 +49,10 @@ export function generateSteps(ts) {
   }
 
   if (ts.tour && ts.tour !== 'None') {
-    add('Kick-off call', 'tour', `[${ts.tour} setup step — instructions TBD]`);
+    const tourText = ts.tour === 'Showmojo'
+      ? 'Showmojo webhook setup — follow the instructions here: https://reffie.tawk.help/article/webhook-setup'
+      : `[${ts.tour} setup step — instructions TBD]`;
+    add('Kick-off call', 'tour', tourText);
     if (ts.lockboxes) {
       add('Kick-off call', 'lockbox', `[Lockbox configuration for ${ts.tour} — instructions TBD]`, true);
     }
