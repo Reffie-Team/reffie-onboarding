@@ -133,7 +133,7 @@ export function syncChecklist(checklist, steps) {
   const next = {};
 
   steps.forEach((s) => {
-    next[s.id] = checklist[s.id] ?? { done: false, note: '' };
+    next[s.id] = checklist[s.id] ?? { done: false, note: '', first_touched_at: null, completed_at: null };
   });
 
   // Orphaned entries (step removed because tech stack changed) are dropped

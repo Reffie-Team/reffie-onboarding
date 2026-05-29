@@ -15,6 +15,8 @@ import { generateSteps, syncChecklist } from './stepsEngine';
  * - Steps in the current stage → done: false (unless overridden)
  * - Future stages → not yet created (syncChecklist handles defaults)
  */
+const SEED_PAST_TS = new Date('2026-05-01').toISOString();
+
 function seedChecklist(account) {
   const steps = generateSteps(account.ts);
   const stageIdx = STAGES.indexOf(account.stage);
@@ -22,7 +24,13 @@ function seedChecklist(account) {
 
   steps.forEach((s) => {
     const sIdx = STAGES.indexOf(s.stage);
-    cl[s.id] = { done: sIdx < stageIdx, note: '' };
+    const isDone = sIdx < stageIdx;
+    cl[s.id] = {
+      done: isDone,
+      note: '',
+      first_touched_at: isDone ? SEED_PAST_TS : null,
+      completed_at: isDone ? SEED_PAST_TS : null,
+    };
   });
 
   return cl;
@@ -135,6 +143,12 @@ if (acc1) {
   const steps = generateSteps(acc1.ts);
   const koSteps = steps.filter((s) => s.stage === 'Kick-off call');
   koSteps.forEach((s, i) => {
-    acc1.cl[s.id] = { done: i < 4, note: '' };
+    const isDone = i < 4;
+    acc1.cl[s.id] = {
+      done: isDone,
+      note: '',
+      first_touched_at: isDone ? SEED_PAST_TS : null,
+      completed_at: isDone ? SEED_PAST_TS : null,
+    };
   });
 }

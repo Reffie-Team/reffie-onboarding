@@ -97,10 +97,24 @@ const useAccountStore = create(
           const account = s.accounts.find((a) => a.id === id);
           if (!account) return {};
 
-          const existing = account.cl[stepId] ?? { done: false, note: '' };
+          const existing = account.cl[stepId] ?? { done: false, note: '', first_touched_at: null, completed_at: null };
+          const nowIso = new Date().toISOString();
+          const becomingDone = !existing.done;
+          const updatedStep = becomingDone
+            ? {
+                ...existing,
+                done: true,
+                first_touched_at: existing.first_touched_at ?? nowIso,
+                completed_at: nowIso,
+              }
+            : {
+                ...existing,
+                done: false,
+                completed_at: null,
+              };
           const newCl = {
             ...account.cl,
-            [stepId]: { ...existing, done: !existing.done },
+            [stepId]: updatedStep,
           };
 
           let updated = { ...account, cl: newCl };
