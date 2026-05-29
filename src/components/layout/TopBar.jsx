@@ -1,18 +1,29 @@
-import React from 'react';
-import { Link, useMatch } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import useAccountStore from '@/store/useAccountStore';
+import useAuthStore from '@/store/useAuthStore';
 
-/**
- * TopBar — sticky header.
- * Breadcrumb: "Onboarding" on dashboard, "Onboarding › Account Name" on detail.
- */
 export default function TopBar() {
-  // useMatch works anywhere inside <BrowserRouter>, no route context needed
   const match = useMatch('/accounts/:id');
   const accountId = match?.params?.id ?? null;
 
   const accounts = useAccountStore((s) => s.accounts);
   const account = accountId ? accounts.find((a) => a.id === accountId) : null;
+
+  const user = useAuthStore((s) => s.user);
+  const clearUser = useAuthStore((s) => s.clearUser);
+  const navigate = useNavigate();
+
+  const [imgError, setImgError] = useState(false);
+
+  const handleSignOut = () => {
+    clearUser();
+    navigate('/login');
+  };
+
+  const initials = user?.name
+    ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+    : '?';
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[rgba(0,0,0,0.08)] h-14 px-7 flex items-center justify-between">
@@ -45,12 +56,31 @@ export default function TopBar() {
         </nav>
       </div>
 
-      {/* Right — avatar (static Phase 1) */}
-      <div
-        className="w-[30px] h-[30px] rounded-full bg-brand text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0"
-        title="Jamie Torres"
-      >
-        JT
+      {/* Right — avatar + sign out */}
+      <div className="flex items-center gap-3">
+        {user?.picture && !imgError ? (
+          <img
+            src={user.picture}
+            alt={user.name ?? 'User'}
+            referrerPolicy="no-referrer"
+            onError={() => setImgError(true)}
+            className="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
+          />
+        ) : (
+          <div
+            className="w-[30px] h-[30px] rounded-full bg-brand text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0"
+            title={user?.name ?? ''}
+          >
+            {initials}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="text-[13px] text-muted bg-transparent border-none cursor-pointer hover:text-ink transition-colors p-0"
+        >
+          Sign out
+        </button>
       </div>
     </header>
   );
