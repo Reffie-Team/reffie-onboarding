@@ -272,7 +272,7 @@ const useAccountStore = create(
 
     // ── Persist config ───────────────────────────────────────────────────────
     {
-      name: 'reffie-onboarding-v1',
+      name: 'reffie-onboarding-v2',
       storage: createJSONStorage(() => localStorage),
       // currentId excluded — resets on load (URL is source of truth)
       partialize: (s) => ({
