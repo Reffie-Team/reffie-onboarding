@@ -10,6 +10,24 @@ import StepCheckbox from '@/components/ui/StepCheckbox';
  *  - Collapsible textarea (local state — resets on mount like prototype)
  *  - Sub-item indentation with left green bar
  */
+function renderTextWithLinks(text) {
+  return text.split(/(\s+)/).map((token, i) =>
+    token.startsWith('https://') ? (
+      <a
+        key={i}
+        href={token}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-brand underline hover:text-brand-dark"
+      >
+        {token}
+      </a>
+    ) : (
+      token
+    )
+  );
+}
+
 export default function StepItem({ step, state, onToggle, onSaveNote }) {
   const [noteOpen, setNoteOpen] = useState(!!state.note);
   const textareaRef = useRef(null);
@@ -53,7 +71,7 @@ export default function StepItem({ step, state, onToggle, onSaveNote }) {
             isPlaceholder && !state.done ? 'italic text-hint' : 'text-ink',
           ].join(' ')}
         >
-          {step.text}
+          {renderTextWithLinks(step.text)}
           {hasNote && (
             <span className="inline-flex items-center text-[11px] font-semibold text-muted bg-[#F0EDE8] rounded-pill px-1.5 py-px ml-1.5 align-middle">
               note
