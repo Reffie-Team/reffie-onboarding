@@ -6,6 +6,7 @@ import TopBar from '@/components/layout/TopBar';
 import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
 import AccountDetail from '@/pages/AccountDetail';
+import MyTasks from '@/pages/MyTasks';
 import Login from '@/pages/Login';
 
 // Layout wrapper: TopBar + route outlet. Used by all non-login routes.
@@ -36,6 +37,10 @@ export default function App() {
           <Route
             path="/accounts/:id"
             element={<ProtectedRoute><AccountDetail /></ProtectedRoute>}
+          />
+          <Route
+            path="/tasks"
+            element={<ProtectedRoute><MyTasks /></ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

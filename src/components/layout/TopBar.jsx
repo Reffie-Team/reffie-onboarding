@@ -6,6 +6,7 @@ import useAuthStore from '@/store/useAuthStore';
 export default function TopBar() {
   const match = useMatch('/accounts/:id');
   const accountId = match?.params?.id ?? null;
+  const isTasksRoute = !!useMatch('/tasks');
 
   const accounts = useAccountStore((s) => s.accounts);
   const account = accountId ? accounts.find((a) => a.id === accountId) : null;
@@ -51,9 +52,24 @@ export default function TopBar() {
               <span className="text-ink font-semibold">{account.name}</span>
             </>
           ) : (
-            <span className="text-ink font-semibold">Onboarding</span>
+            <span className={isTasksRoute ? 'text-muted' : 'text-ink font-semibold'}>
+              {isTasksRoute ? (
+                <Link to="/dashboard" className="text-muted hover:text-ink transition-colors cursor-pointer">
+                  Onboarding
+                </Link>
+              ) : 'Onboarding'}
+            </span>
           )}
         </nav>
+
+        <span className="w-px h-[18px] bg-[rgba(0,0,0,0.08)]" aria-hidden />
+
+        <Link
+          to="/tasks"
+          className={`text-sm transition-colors ${isTasksRoute ? 'text-ink font-semibold' : 'text-muted hover:text-ink'}`}
+        >
+          My tasks
+        </Link>
       </div>
 
       {/* Right — avatar + sign out */}

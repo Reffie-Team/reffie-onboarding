@@ -45,7 +45,7 @@ const RAW_ACCOUNTS = [
     arr: 24000,
     months: 12,
     metrics: 'Reduce lead response time; increase contact rate from 40% to 65%',
-    rep: 'Jamie Torres',
+    rep: 'Angelina LaPerla',
     stage: 'Kick-off call',
     ts: {
       pms: 'AppFolio',
@@ -68,7 +68,7 @@ const RAW_ACCOUNTS = [
     arr: 41500,
     months: 24,
     metrics: 'Automate 60% of initial lead responses; reduce vacancy days by 15%',
-    rep: 'Marcus Webb',
+    rep: 'Angelina LaPerla',
     stage: 'Training call',
     ts: {
       pms: 'Yardi',
@@ -91,7 +91,7 @@ const RAW_ACCOUNTS = [
     arr: 18000,
     months: 12,
     metrics: 'Improve lead-to-showing conversion from 22% to 40%',
-    rep: 'Jamie Torres',
+    rep: 'Angelina LaPerla',
     stage: 'Pre-kick off',
     ts: {
       pms: 'Buildium',
@@ -114,7 +114,7 @@ const RAW_ACCOUNTS = [
     arr: 62000,
     months: 24,
     metrics: 'Centralize 8 properties into one leasing workflow; hit 80% contact rate',
-    rep: 'Sofia Nguyen',
+    rep: 'Angelina LaPerla',
     stage: 'Check-in (1 week post training)',
     ts: {
       pms: 'Entrata',
