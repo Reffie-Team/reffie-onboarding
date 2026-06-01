@@ -20,7 +20,7 @@ export function makeStepId(stage, key) {
 // ─── Step generation ─────────────────────────────────────────────────────────
 
 /**
- * generateSteps(techStack) → Step[]
+ * generateSteps(techStack, skippedStages) → Step[]
  *
  * Derives the complete ordered checklist from a tech-stack configuration.
  * Steps are tagged with their owning stage so we can group them.
@@ -28,17 +28,21 @@ export function makeStepId(stage, key) {
  * Step shape:
  *   { id: string, stage: string, text: string, sub: boolean }
  *
- * @param {object} ts - TechStack object
+ * @param {object}   ts            - TechStack object
+ * @param {string[]} skippedStages - stages marked as not required (default [])
  */
-export function generateSteps(ts) {
+export function generateSteps(ts, skippedStages = []) {
   const steps = [];
 
   const add = (stage, key, text, sub = false) =>
     steps.push({ id: makeStepId(stage, key), stage, text, sub });
 
+  const validationSkipped = skippedStages.includes('Validation call');
+
   // ── Pre-kick off ──────────────────────────────────────────────────────────
   add('Pre-kick off', 'welcome', 'Send welcome email and onboarding prep document');
   add('Pre-kick off', 'confirm', 'Confirm kick-off call is scheduled and all attendees confirmed');
+  add('Pre-kick off', 'schedule-kickoff', 'Schedule kick-off call');
 
   // ── Kick-off call — conditional on tech stack ─────────────────────────────
   if (ts.pms) {
@@ -83,14 +87,23 @@ export function generateSteps(ts) {
     add('Kick-off call', 'email', `[Shared leasing email forwarding setup${suffix} — instructions TBD]`);
   }
 
+  // When Validation call is skipped, schedule-training moves into Kick-off call
+  if (validationSkipped) {
+    add('Kick-off call', 'schedule-training', 'Schedule training call');
+  }
+
   // ── Validation call ───────────────────────────────────────────────────────
   add('Validation call', 'val1', 'Validate all integrations are receiving leads correctly');
   add('Validation call', 'val2', 'Confirm lead routing rules and assignment logic with CS rep');
+  if (!validationSkipped) {
+    add('Validation call', 'schedule-training', 'Schedule training call');
+  }
 
   // ── Training call ─────────────────────────────────────────────────────────
   add('Training call', 'tr1', 'Complete full platform walkthrough with primary user(s)');
   add('Training call', 'tr2', 'Review messaging templates and automated response workflows');
   add('Training call', 'tr3', 'Confirm success metrics baseline has been recorded');
+  add('Training call', 'schedule-checkin', 'Schedule check-in call');
 
   // ── 1-week check-in ───────────────────────────────────────────────────────
   add('Check-in (1 week post training)', 'w1a', 'Review lead volume and response rate since go-live');
@@ -151,7 +164,7 @@ export function syncChecklist(checklist, steps) {
  * Progress within the account's *current* stage only.
  */
 export function getProgress(account) {
-  const steps = generateSteps(account.ts);
+  const steps = generateSteps(account.ts, account.skippedStages ?? []);
   const stageSteps = steps.filter((s) => s.stage === account.stage);
   const cl = account.cl ?? {};
   const done = stageSteps.filter((s) => cl[s.id]?.done === true).length;
@@ -165,7 +178,7 @@ export function getProgress(account) {
  * Overall progress across all steps.
  */
 export function getTotalProgress(account) {
-  const steps = generateSteps(account.ts);
+  const steps = generateSteps(account.ts, account.skippedStages ?? []);
   const done = steps.filter((s) => account.cl[s.id]?.done).length;
   return { done, total: steps.length };
 }
@@ -179,7 +192,7 @@ export function getTotalProgress(account) {
  * AND there is a next stage to advance to.
  */
 export function shouldAdvanceStage(account, updatedChecklist) {
-  const steps = generateSteps(account.ts);
+  const steps = generateSteps(account.ts, account.skippedStages ?? []);
   const stageSteps = steps.filter((s) => s.stage === account.stage);
   if (!stageSteps.length) return false;
   const allDone = stageSteps.every((s) => updatedChecklist[s.id]?.done);
