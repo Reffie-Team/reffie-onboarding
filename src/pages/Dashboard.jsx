@@ -1,20 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import useAccountStore from '@/store/useAccountStore';
+import { api } from '@/lib/api';
+import useToast from '@/hooks/useToast';
 import StatCards from '@/components/dashboard/StatCards';
 import FilterRow from '@/components/dashboard/FilterRow';
 import AccountsTable from '@/components/dashboard/AccountsTable';
 import AddAccountModal from '@/modals/AddAccountModal';
 
 export default function Dashboard() {
-  const accounts  = useAccountStore((s) => s.accounts);
-  const loading   = useAccountStore((s) => s.loading);
-  const sortKey   = useAccountStore((s) => s.sortKey);
-  const sortDir   = useAccountStore((s) => s.sortDir);
-  const filters   = useAccountStore((s) => s.filters);
-  const setSort   = useAccountStore((s) => s.setSort);
-  const setFilter = useAccountStore((s) => s.setFilter);
+  const accounts      = useAccountStore((s) => s.accounts);
+  const loading       = useAccountStore((s) => s.loading);
+  const sortKey       = useAccountStore((s) => s.sortKey);
+  const sortDir       = useAccountStore((s) => s.sortDir);
+  const filters       = useAccountStore((s) => s.filters);
+  const setSort       = useAccountStore((s) => s.setSort);
+  const setFilter     = useAccountStore((s) => s.setFilter);
+  const fetchAccounts = useAccountStore((s) => s.fetchAccounts);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [syncing,   setSyncing]   = useState(false);
+  const { showToast } = useToast();
 
   const filtered = useMemo(() => {
     const q = filters.query.toLowerCase();
@@ -28,6 +33,22 @@ export default function Dashboard() {
     });
   }, [accounts, filters]);
 
+  const handleSync = async () => {
+    if (syncing) return;
+    const dealId = window.prompt('Enter HubSpot deal ID:');
+    if (!dealId || !dealId.trim()) return;
+    setSyncing(true);
+    try {
+      await api.hubspot.sync(dealId.trim());
+      showToast('Account synced from HubSpot');
+      await fetchAccounts();
+    } catch (err) {
+      showToast(err?.message || 'Sync failed — check the deal ID and try again');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <main className="max-w-[1240px] mx-auto px-7 py-[30px] max-[600px]:px-[14px] max-[600px]:py-[18px]">
       {/* Page header */}
@@ -40,12 +61,22 @@ export default function Dashboard() {
             <span className="text-brand">Track</span> your onboarding accounts
           </h1>
         </div>
-        <button
-          className="btn-primary flex-shrink-0"
-          onClick={() => setModalOpen(true)}
-        >
-          + Add account
-        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            className="btn-secondary"
+            onClick={handleSync}
+            disabled={syncing}
+            style={syncing ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
+          >
+            {syncing ? 'Syncing…' : 'Sync from HubSpot'}
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => setModalOpen(true)}
+          >
+            + Add account
+          </button>
+        </div>
       </div>
 
       {loading && accounts.length === 0 ? (
