@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
 import useAccountStore from '@/store/useAccountStore';
 import { generateSteps, getTotalProgress } from '@/lib/stepsEngine';
 import { useToast } from '@/components/layout/Toast';
@@ -84,13 +83,14 @@ function DrawerBody({ accountId, stepId, onClose }) {
           <h2 className="text-[20px] font-bold tracking-tight text-ink leading-tight truncate">
             {account.name}
           </h2>
-          <Link
-            to={`/accounts/${account.id}`}
-            onClick={onClose}
+          <a
+            href={`/accounts/${account.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm text-brand hover:underline"
           >
             Go to account →
-          </Link>
+          </a>
         </div>
 
         <button
