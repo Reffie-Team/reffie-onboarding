@@ -77,10 +77,11 @@ export function generateSteps(ts, skippedStages = []) {
   }
 
   if (ts.sharedEmail) {
-    const allAddrs = [ts.sharedEmailAddr, ...(ts.sharedEmailAddrs || [])]
-      .filter(Boolean);
-    const suffix = allAddrs.length > 0 ? ` — ${allAddrs.join(', ')}` : '';
-    add('Kick-off call', 'email', `[Shared leasing email forwarding setup${suffix} — instructions TBD]`);
+    const emailText =
+      ts.sharedEmailProvider === 'Gmail'   ? 'Set up Gmail email forwarding' :
+      ts.sharedEmailProvider === 'Outlook' ? 'Set up Outlook email forwarding' :
+                                             'Set up shared leasing email forwarding';
+    add('Kick-off call', 'email', emailText);
   }
 
   // When Validation call is skipped, schedule-training moves into Kick-off call
