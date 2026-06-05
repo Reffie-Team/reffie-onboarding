@@ -84,9 +84,12 @@ export default function AccountsTable({ accounts, sortKey, sortDir, onSort }) {
                 <tr
                   key={acc.id}
                   onClick={() => navigate(`/accounts/${acc.id}`)}
-                  className="group border-b border-[rgba(0,0,0,0.08)] last:border-b-0
-                    cursor-pointer transition-colors duration-[120ms]
-                    hover:bg-brand-tint"
+                  className={[
+                    'group border-b border-[rgba(0,0,0,0.08)] last:border-b-0',
+                    'cursor-pointer transition-colors duration-[120ms]',
+                    'hover:bg-brand-tint',
+                    acc.archived ? 'opacity-50' : '',
+                  ].join(' ')}
                 >
                   {/* Customer */}
                   <td className="px-[18px] py-[14px] align-middle">
@@ -96,7 +99,10 @@ export default function AccountsTable({ accounts, sortKey, sortDir, onSort }) {
 
                   {/* Stage */}
                   <td className="px-[18px] py-[14px] align-middle">
-                    <Badge variant={stageBadgeVariant(acc.stage)}>{acc.stage}</Badge>
+                    {acc.archived
+                      ? <Badge variant="gray">Archived</Badge>
+                      : <Badge variant={stageBadgeVariant(acc.stage)}>{acc.stage}</Badge>
+                    }
                   </td>
 
                   {/* Progress */}

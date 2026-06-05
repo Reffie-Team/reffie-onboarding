@@ -43,10 +43,10 @@ const useAccountStore = create((set, get) => ({
 
   // ── Fetch actions ──────────────────────────────────────────────────────────
 
-  fetchAccounts: async () => {
+  fetchAccounts: async (includeArchived = false) => {
     set({ loading: true, error: null });
     try {
-      const accounts = await api.accounts.list();
+      const accounts = await api.accounts.list(includeArchived);
       set({ accounts, loading: false });
     } catch (err) {
       set({ loading: false, error: err.message ?? 'Failed to load accounts.' });
@@ -264,6 +264,22 @@ const useAccountStore = create((set, get) => ({
       set((s) => ({
         accounts: s.accounts.map((a) => (a.id === id ? account : a)),
         error: err.message ?? 'Failed to save.',
+      }));
+    });
+  },
+
+  // ── Archive ────────────────────────────────────────────────────────────────
+
+  archiveAccount: (id, archived) => {
+    const account = get().accounts.find((a) => a.id === id);
+    if (!account) return;
+    set((s) => ({
+      accounts: s.accounts.map((a) => (a.id === id ? { ...a, archived } : a)),
+    }));
+    api.accounts.update(id, { archived }).catch((err) => {
+      set((s) => ({
+        accounts: s.accounts.map((a) => (a.id === id ? account : a)),
+        error: err.message ?? 'Failed to update archive status.',
       }));
     });
   },

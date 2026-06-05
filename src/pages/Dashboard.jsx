@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import useAccountStore from '@/store/useAccountStore';
 import { api } from '@/lib/api';
 import useToast from '@/hooks/useToast';
@@ -17,13 +17,20 @@ export default function Dashboard() {
   const setFilter     = useAccountStore((s) => s.setFilter);
   const fetchAccounts = useAccountStore((s) => s.fetchAccounts);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [syncing,   setSyncing]   = useState(false);
+  const [modalOpen,    setModalOpen]    = useState(false);
+  const [syncing,      setSyncing]      = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const { showToast } = useToast();
+
+  // Re-fetch when the show-archived toggle changes.
+  useEffect(() => {
+    fetchAccounts(showArchived);
+  }, [showArchived]);
 
   const filtered = useMemo(() => {
     const q = filters.query.toLowerCase();
     return accounts.filter((a) => {
+      if (!showArchived && a.archived) return false;
       if (q && !a.name.toLowerCase().includes(q) && !a.location.toLowerCase().includes(q))
         return false;
       if (filters.stage && a.stage !== filters.stage) return false;
@@ -31,7 +38,7 @@ export default function Dashboard() {
       if (filters.rep   && a.rep   !== filters.rep)   return false;
       return true;
     });
-  }, [accounts, filters]);
+  }, [accounts, filters, showArchived]);
 
   const handleSync = async () => {
     if (syncing) return;
@@ -41,7 +48,7 @@ export default function Dashboard() {
     try {
       await api.hubspot.sync(dealId.trim());
       showToast('Account synced from HubSpot');
-      await fetchAccounts();
+      await fetchAccounts(showArchived);
     } catch (err) {
       showToast(err?.message || 'Sync failed — check the deal ID and try again');
     } finally {
@@ -85,12 +92,15 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          <StatCards accounts={accounts} />
+          {/* Stats always exclude archived accounts */}
+          <StatCards accounts={accounts.filter((a) => !a.archived)} />
           <FilterRow
             accounts={accounts}
             filters={filters}
             onFilter={setFilter}
             filteredCount={filtered.length}
+            showArchived={showArchived}
+            onToggleArchived={() => setShowArchived((v) => !v)}
           />
           <AccountsTable
             accounts={filtered}

@@ -129,6 +129,7 @@ export function mapAccountFromApi(data) {
     ts: mapTsFromApi(data.tech_stack),         // backend column: tech_stack (JSONB)
     pocs: (data.pocs ?? []).map(mapPocFromApi),
     cl: mapChecklistFromApi(data.checklist_items),
+    archived: data.archived ?? false,
   };
 }
 
@@ -153,6 +154,7 @@ function mapAccountPatchToApi(patch) {
   if (patch.skippedStages !== undefined)  out.skipped_stages = patch.skippedStages;
   if (patch.pocs !== undefined)           out.pocs = patch.pocs.map(mapPocToApi);
   if (patch.ts !== undefined)             out.tech_stack = mapTsToApi(patch.ts); // backend column: tech_stack
+  if (patch.archived !== undefined)       out.archived = patch.archived;
   return out;
 }
 
@@ -195,8 +197,9 @@ export async function apiFetch(path, options = {}) {
 
 export const api = {
   accounts: {
-    list: async () => {
-      const data = await apiFetch('/accounts');
+    list: async (includeArchived = false) => {
+      const qs = includeArchived ? '?include_archived=true' : '';
+      const data = await apiFetch(`/accounts${qs}`);
       return (data ?? []).map(mapAccountFromApi);
     },
     get: async (id) => {

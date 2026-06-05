@@ -5,7 +5,7 @@ import { STAGES } from '@/lib/constants';
  * FilterRow — search pill + 3 filter selects + result count badge.
  * Matches prototype's .frow layout exactly.
  */
-export default function FilterRow({ accounts, filters, onFilter, filteredCount }) {
+export default function FilterRow({ accounts, filters, onFilter, filteredCount, showArchived, onToggleArchived }) {
   const reps = [...new Set(accounts.map((a) => a.rep))].sort();
   const total = accounts.length;
 
@@ -72,6 +72,17 @@ export default function FilterRow({ accounts, filters, onFilter, filteredCount }
           <option key={r}>{r}</option>
         ))}
       </select>
+
+      {/* Show archived toggle */}
+      <label className="flex items-center gap-1.5 text-sm text-muted cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={!!showArchived}
+          onChange={onToggleArchived}
+          className="accent-[#10BD91] cursor-pointer"
+        />
+        Show archived
+      </label>
 
       {/* Result count */}
       <span className="ml-auto text-xs font-medium text-hint bg-white border border-[rgba(0,0,0,0.08)] rounded-pill px-[10px] py-[3px] whitespace-nowrap">
