@@ -59,7 +59,7 @@ export const ZILLOW_OPTIONS = ['None', 'Paid', 'Free'];
 // ─── Dashboard table columns ─────────────────────────────────────────────────
 
 export const TABLE_COLS = [
-  { key: 'name',     label: 'Customer',   sortable: true  },
+  { key: 'name',     label: 'Deal Name',  sortable: true  },
   { key: 'stage',    label: 'Stage',      sortable: true  },
   { key: 'progress', label: 'Progress',   sortable: true  },
   { key: 'arr',      label: 'ARR',        sortable: true  },

@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import ProgressBar from '@/components/ui/ProgressBar';
 
 const COLS = [
-  { key: 'name',     label: 'Customer',  sortable: true  },
+  { key: 'name',     label: 'Deal Name', sortable: true  },
   { key: 'stage',    label: 'Stage',     sortable: true  },
   { key: 'progress', label: 'Progress',  sortable: true  },
   { key: 'arr',      label: 'ARR',       sortable: true  },
@@ -91,7 +91,7 @@ export default function AccountsTable({ accounts, sortKey, sortDir, onSort }) {
                     acc.archived ? 'opacity-50' : '',
                   ].join(' ')}
                 >
-                  {/* Customer */}
+                  {/* Deal Name */}
                   <td className="px-[18px] py-[14px] align-middle">
                     <div className="font-semibold text-base leading-snug">{acc.name}</div>
                     <div className="text-xs text-muted mt-px">{acc.location}</div>
