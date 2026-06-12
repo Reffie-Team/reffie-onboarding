@@ -80,7 +80,7 @@ export default function UpcomingDealsTable({ deals }) {
                   </td>
 
                   <td className="px-[18px] py-[14px] align-middle font-semibold text-base">
-                    {fmtArr(deal.arr)}
+                    {deal.arr != null ? fmtArr(deal.arr) : '—'}
                   </td>
 
                   <td className="px-[18px] py-[14px] align-middle text-sm text-muted">

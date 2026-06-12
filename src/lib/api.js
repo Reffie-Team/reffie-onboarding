@@ -141,7 +141,7 @@ function mapUpcomingDealFromApi(data) {
     dealStage:     data.deal_stage ?? '',
     ts:            mapTsFromApi(data.tech_stack),
     salesRep:      data.sales_rep_name ?? '',
-    arr:           Number(data.arr ?? 0),
+    arr:           data.arr != null ? Number(data.arr) : null,
     closeDate:     data.close_date ?? null,
     lastSyncedAt:  data.last_synced_at ?? null,
     createdAt:     data.created_at ?? null,

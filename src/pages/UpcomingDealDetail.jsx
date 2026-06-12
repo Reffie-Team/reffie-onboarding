@@ -112,7 +112,7 @@ export default function UpcomingDealDetail() {
               Deal info
             </span>
             <InfoRow label="ARR">
-              <span className="font-bold text-[15px] text-brand">{fmtArr(deal.arr)}</span>
+              <span className="font-bold text-[15px] text-brand">{deal.arr != null ? fmtArr(deal.arr) : '—'}</span>
             </InfoRow>
             <InfoRow label="Deal stage">
               {DEAL_STAGE_LABELS[deal.dealStage] ?? deal.dealStage}
