@@ -61,8 +61,8 @@ export default function TopBar() {
               <span className="text-ink font-semibold">{account.name}</span>
             </>
           ) : (
-            <span className={isTasksRoute ? 'text-muted' : 'text-ink font-semibold'}>
-              {isTasksRoute ? (
+            <span className={(isTasksRoute || onDealsSection) ? 'text-muted' : 'text-ink font-semibold'}>
+              {(isTasksRoute || onDealsSection) ? (
                 <Link to="/dashboard" className="text-muted hover:text-ink transition-colors cursor-pointer">
                   Onboarding
                 </Link>
