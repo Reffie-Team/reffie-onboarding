@@ -7,22 +7,28 @@ import ProtectedRoute from '@/components/layout/ProtectedRoute';
 import Dashboard from '@/pages/Dashboard';
 import AccountDetail from '@/pages/AccountDetail';
 import MyTasks from '@/pages/MyTasks';
+import UpcomingDeals from '@/pages/UpcomingDeals';
+import UpcomingDealDetail from '@/pages/UpcomingDealDetail';
 import Login from '@/pages/Login';
 import useAuthStore from '@/store/useAuthStore';
 import useAccountStore from '@/store/useAccountStore';
+import useUpcomingDealsStore from '@/store/useUpcomingDealsStore';
 
 // Surfaces store errors as toasts without duplicating useEffect in every page.
 function ErrorHandler() {
-  const error = useAccountStore((s) => s.error);
-  const clearError = useAccountStore((s) => s.clearError);
+  const accountError = useAccountStore((s) => s.error);
+  const clearAccount = useAccountStore((s) => s.clearError);
+  const dealsError   = useUpcomingDealsStore((s) => s.error);
+  const clearDeals   = useUpcomingDealsStore((s) => s.clearError);
   const { showToast } = useToast();
 
   useEffect(() => {
-    if (error) {
-      showToast(error);
-      clearError();
-    }
-  }, [error, clearError, showToast]);
+    if (accountError) { showToast(accountError); clearAccount(); }
+  }, [accountError, clearAccount, showToast]);
+
+  useEffect(() => {
+    if (dealsError) { showToast(dealsError); clearDeals(); }
+  }, [dealsError, clearDeals, showToast]);
 
   return null;
 }
@@ -32,6 +38,7 @@ function AppLayout() {
   const user  = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
   const fetchAccounts = useAccountStore((s) => s.fetchAccounts);
+  const fetchDeals    = useUpcomingDealsStore((s) => s.fetchDeals);
 
   // Gate on both user AND token — Zustand persist rehydrates asynchronously, so
   // user can become truthy one tick before token arrives. Firing fetchAccounts
@@ -39,6 +46,7 @@ function AppLayout() {
   useEffect(() => {
     if (user && token) {
       fetchAccounts();
+      fetchDeals();
     }
   }, [user, token]);
 
@@ -72,6 +80,14 @@ export default function App() {
           <Route
             path="/tasks"
             element={<ProtectedRoute><MyTasks /></ProtectedRoute>}
+          />
+          <Route
+            path="/upcoming-deals"
+            element={<ProtectedRoute><UpcomingDeals /></ProtectedRoute>}
+          />
+          <Route
+            path="/upcoming-deals/:id"
+            element={<ProtectedRoute><UpcomingDealDetail /></ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

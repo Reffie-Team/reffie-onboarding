@@ -2,11 +2,20 @@ import React, { useState } from 'react';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import useAccountStore from '@/store/useAccountStore';
 import useAuthStore from '@/store/useAuthStore';
+import useUpcomingDealsStore from '@/store/useUpcomingDealsStore';
+import { hasUnsupportedTech } from '@/lib/stepsEngine';
 
 export default function TopBar() {
   const match = useMatch('/accounts/:id');
   const accountId = match?.params?.id ?? null;
-  const isTasksRoute = !!useMatch('/tasks');
+  const isTasksRoute       = !!useMatch('/tasks');
+  const isDealsRoute       = !!useMatch('/upcoming-deals');
+  const isDealsDetailRoute = !!useMatch('/upcoming-deals/:id');
+  const onDealsSection     = isDealsRoute || isDealsDetailRoute;
+
+  const badgeCount = useUpcomingDealsStore(
+    (s) => s.deals.filter((d) => hasUnsupportedTech(d.ts)).length
+  );
 
   const accounts = useAccountStore((s) => s.accounts);
   const account = accountId ? accounts.find((a) => a.id === accountId) : null;
@@ -69,6 +78,25 @@ export default function TopBar() {
           className={`text-sm transition-colors ${isTasksRoute ? 'text-ink font-semibold' : 'text-muted hover:text-ink'}`}
         >
           My tasks
+        </Link>
+
+        <span className="w-px h-[18px] bg-[rgba(0,0,0,0.08)]" aria-hidden />
+
+        <Link
+          to="/upcoming-deals"
+          className={`text-sm transition-colors relative ${onDealsSection ? 'text-ink font-semibold' : 'text-muted hover:text-ink'}`}
+        >
+          Upcoming deals
+          {badgeCount > 0 && (
+            <span
+              className="absolute -top-[6px] -right-[14px] min-w-[16px] h-4
+                bg-red-600 text-white text-[10px] font-bold leading-none
+                rounded-full flex items-center justify-center px-[4px]"
+              aria-label={`${badgeCount} deal${badgeCount !== 1 ? 's' : ''} with unsupported tech`}
+            >
+              {badgeCount}
+            </span>
+          )}
         </Link>
       </div>
 

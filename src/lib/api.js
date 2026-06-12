@@ -133,6 +133,22 @@ export function mapAccountFromApi(data) {
   };
 }
 
+function mapUpcomingDealFromApi(data) {
+  return {
+    id:            data.id,
+    hubspotDealId: data.hubspot_deal_id ?? null,
+    companyName:   data.company_name ?? '',
+    dealStage:     data.deal_stage ?? '',
+    ts:            mapTsFromApi(data.tech_stack),
+    salesRep:      data.sales_rep_name ?? '',
+    arr:           Number(data.arr ?? 0),
+    closeDate:     data.close_date ?? null,
+    lastSyncedAt:  data.last_synced_at ?? null,
+    createdAt:     data.created_at ?? null,
+    updatedAt:     data.updated_at ?? null,
+  };
+}
+
 // ── Frontend → Backend mapping ────────────────────────────────────────────────
 
 /**
@@ -254,6 +270,20 @@ export const api = {
     sync: async (dealId) => {
       const data = await apiFetch(`/hubspot/sync/${dealId}`, { method: 'POST' });
       return mapAccountFromApi(data);
+    },
+  },
+
+  upcomingDeals: {
+    list: async () => {
+      const data = await apiFetch('/upcoming-deals');
+      return (data ?? []).map(mapUpcomingDealFromApi);
+    },
+    get: async (id) => {
+      const data = await apiFetch(`/upcoming-deals/${id}`);
+      return mapUpcomingDealFromApi(data);
+    },
+    refresh: () => {
+      apiFetch('/upcoming-deals/refresh', { method: 'POST' }).catch(() => {});
     },
   },
 };

@@ -7,6 +7,23 @@
 
 import { STAGES } from './constants';
 
+// ─── Unsupported tech detection ───────────────────────────────────────────────
+
+export const UNSUPPORTED_TS = {
+  pms:          ['Buildium', 'Other'],
+  tour:         ['Rently', 'Showing Hero', 'Calendly', 'Showdigs', 'Other'],
+  applications: ['Other'],
+};
+
+export function hasUnsupportedTech(ts) {
+  if (!ts) return false;
+  return (
+    UNSUPPORTED_TS.pms.includes(ts.pms) ||
+    UNSUPPORTED_TS.tour.includes(ts.tour) ||
+    UNSUPPORTED_TS.applications.includes(ts.applications)
+  );
+}
+
 // ─── ID helpers ──────────────────────────────────────────────────────────────
 
 /**

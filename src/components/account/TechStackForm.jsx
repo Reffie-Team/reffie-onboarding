@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PMS_OPTIONS, TOUR_OPTIONS, APPLICATIONS_OPTIONS, ZILLOW_OPTIONS } from '@/lib/constants';
-import { generateSteps } from '@/lib/stepsEngine';
+import { generateSteps, UNSUPPORTED_TS } from '@/lib/stepsEngine';
 import Toggle from '@/components/ui/Toggle';
 import useAccountStore from '@/store/useAccountStore';
 
@@ -110,7 +110,7 @@ export default function TechStackForm({ account }) {
         <select className={selectCls} value={ts.pms} onChange={(e) => handleChange('pms', e.target.value)}>
           {PMS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
         </select>
-        {['Buildium', 'Other'].includes(ts.pms) && (
+        {UNSUPPORTED_TS.pms.includes(ts.pms) && (
           <p className="mt-1 text-xs text-red-600 leading-snug">
             If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
           </p>
@@ -124,7 +124,7 @@ export default function TechStackForm({ account }) {
           {TOUR_OPTIONS.map((o) => <option key={o}>{o}</option>)}
           <option>Other</option>
         </select>
-        {['Rently', 'Showing Hero', 'Calendly', 'Showdigs', 'Other'].includes(ts.tour) && (
+        {UNSUPPORTED_TS.tour.includes(ts.tour) && (
           <p className="mt-1 text-xs text-red-600 leading-snug">
             If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
           </p>
@@ -148,7 +148,7 @@ export default function TechStackForm({ account }) {
         <select className={selectCls} value={ts.applications} onChange={(e) => handleChange('applications', e.target.value)}>
           {APPLICATIONS_OPTIONS.map((o) => <option key={o}>{o}</option>)}
         </select>
-        {ts.applications === 'Other' && (
+        {UNSUPPORTED_TS.applications.includes(ts.applications) && (
           <p className="mt-1 text-xs text-red-600 leading-snug">
             If the client uses a new system that we don't parse, make sure that there is a conversation with engineering about the process & lift before kickoff is scheduled.
           </p>

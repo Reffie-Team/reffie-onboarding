@@ -67,3 +67,10 @@ export const TABLE_COLS = [
   { key: 'rep',      label: 'CS rep',     sortable: true  },
   { key: '_arrow',   label: '',           sortable: false },
 ];
+
+// ─── HubSpot deal stage labels ────────────────────────────────────────────────
+
+export const DEAL_STAGE_LABELS = {
+  '1713761016': 'Demo Completed',
+  'stage_0':    'Negotiations',
+};
