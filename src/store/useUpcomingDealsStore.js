@@ -6,6 +6,15 @@ const useUpcomingDealsStore = create((set, get) => ({
   loading: false,
   error:   null,
 
+  sortKey: 'closeDate',
+  sortDir: 1,
+
+  setSort: (key) =>
+    set((s) => ({
+      sortKey: key,
+      sortDir: s.sortKey === key ? -s.sortDir : 1,
+    })),
+
   clearError: () => set({ error: null }),
 
   fetchDeals: async () => {

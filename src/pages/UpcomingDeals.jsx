@@ -7,6 +7,9 @@ const POLL_INTERVAL_MS = 60_000;
 export default function UpcomingDeals() {
   const deals           = useUpcomingDealsStore((s) => s.deals);
   const loading         = useUpcomingDealsStore((s) => s.loading);
+  const sortKey         = useUpcomingDealsStore((s) => s.sortKey);
+  const sortDir         = useUpcomingDealsStore((s) => s.sortDir);
+  const setSort         = useUpcomingDealsStore((s) => s.setSort);
   const refreshAndFetch = useUpcomingDealsStore((s) => s.refreshAndFetch);
   const fetchDeals      = useUpcomingDealsStore((s) => s.fetchDeals);
 
@@ -42,7 +45,7 @@ export default function UpcomingDeals() {
           <div className="w-8 h-8 border-[3px] border-brand border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <UpcomingDealsTable deals={deals} />
+        <UpcomingDealsTable deals={deals} sortKey={sortKey} sortDir={sortDir} onSort={setSort} />
       )}
     </main>
   );
