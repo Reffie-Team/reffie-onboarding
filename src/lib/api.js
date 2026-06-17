@@ -286,4 +286,17 @@ export const api = {
       apiFetch('/upcoming-deals/refresh', { method: 'POST' }).catch(() => {});
     },
   },
+
+  dayAiCalls: {
+    list: async (accountId) => {
+      const data = await apiFetch(`/accounts/${accountId}/day-ai-calls`);
+      return (data ?? []).map((c) => ({
+        objectId:  c.object_id,
+        title:     c.title      ?? null,
+        startedAt: c.started_at ?? null,
+        summary:   c.summary    ?? null,
+        callUrl:   c.call_url   ?? null,
+      }));
+    },
+  },
 };

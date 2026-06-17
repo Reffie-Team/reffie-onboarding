@@ -11,6 +11,7 @@ import InfoCard from '@/components/account/InfoCard';
 import MainPocsCard from '@/components/account/MainPocsCard';
 import TechStackForm from '@/components/account/TechStackForm';
 import Checklist from '@/components/account/Checklist';
+import DayAiCallsCard from '@/components/account/DayAiCallsCard';
 
 export default function AccountDetail() {
   const { id } = useParams();
@@ -158,6 +159,8 @@ export default function AccountDetail() {
           />
         </div>
       </div>
+
+      <DayAiCallsCard accountId={id} />
     </main>
   );
 }

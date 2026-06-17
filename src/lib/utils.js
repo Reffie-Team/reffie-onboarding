@@ -29,6 +29,15 @@ export function stageBadgeVariant(stage) {
   return 'green';               // 30-day, 60-day
 }
 
+/** Format an ISO date string or datetime. e.g. "2026-06-10T14:30:00Z" → "Jun 10, 2026" */
+export function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+}
+
 // ─── ID generation ────────────────────────────────────────────────────────────
 
 /** Generate a unique account ID. */
