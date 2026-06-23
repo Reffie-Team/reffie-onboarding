@@ -122,7 +122,7 @@ src/
     Dashboard.jsx
     AccountDetail.jsx
   store/
-    useAccountStore.js   # Zustand store — all state + actions
+    useAccountStore.js   # Zustand store — all state + actions (API-backed)
   styles/
     globals.css          # Tailwind directives + Reffie component layer
 ```
