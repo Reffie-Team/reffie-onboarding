@@ -146,9 +146,14 @@ const useAccountStore = create((set, get) => ({
     const newCl = { ...account.cl, [stepId]: updatedStep };
 
     const steps = generateSteps(account.ts, account.skippedStages ?? []);
+    const toggledStepObj = steps.find((s) => s.id === stepId);
+    const stepIsCurrentStage = toggledStepObj?.stage === account.stage;
+
     const stageSteps = steps.filter((s) => s.stage === account.stage);
     const allCurrentDone =
-      stageSteps.length > 0 && stageSteps.every((s) => newCl[s.id]?.done);
+      stepIsCurrentStage &&
+      stageSteps.length > 0 &&
+      stageSteps.every((s) => newCl[s.id]?.done);
 
     let newStage = account.stage;
 
@@ -163,7 +168,7 @@ const useAccountStore = create((set, get) => ({
       } else {
         result = { advanced: false, completed: true };
       }
-    } else {
+    } else if (stepIsCurrentStage) {
       const currentIdx = STAGES.indexOf(account.stage);
       const skippedBack = account.skippedStages ?? [];
       const earliestIncompleteIdx = STAGES.findIndex((stage, i) => {
