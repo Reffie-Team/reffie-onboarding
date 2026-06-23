@@ -6,6 +6,7 @@
  */
 
 import useAuthStore from '@/store/useAuthStore';
+import { silentRefresh } from '@/lib/googleAuth';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/+$/, '');
 
@@ -191,9 +192,17 @@ export async function apiFetch(path, options = {}) {
   if (!token) throw new Error('Not authenticated');
 
   if (isTokenExpired(token)) {
-    useAuthStore.getState().clearUser();
-    window.location.href = '/login';
-    return null;
+    try {
+      const newToken = await silentRefresh();
+      useAuthStore.getState().setUser(useAuthStore.getState().user, newToken);
+      if (!options._silentRetry) {
+        return apiFetch(path, { ...options, _silentRetry: true });
+      }
+    } catch {
+      useAuthStore.getState().clearUser();
+      window.location.href = '/login';
+      return null;
+    }
   }
 
   const headers = {
@@ -205,12 +214,13 @@ export async function apiFetch(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, { ...options, headers });
 
   if (res.status === 401) {
-    // One-shot retry: handles the rehydration race where the token arrived
-    // between the original call and now. Bounded to exactly one retry.
-    if (!options._retry) {
-      const freshToken = useAuthStore.getState().token;
-      if (freshToken) {
-        return apiFetch(path, { ...options, _retry: true });
+    if (!options._retry && !options._silentRetry) {
+      try {
+        const newToken = await silentRefresh();
+        useAuthStore.getState().setUser(useAuthStore.getState().user, newToken);
+        return apiFetch(path, { ...options, _silentRetry: true });
+      } catch {
+        // Silent refresh failed; fall through to logout.
       }
     }
     useAuthStore.getState().clearUser();

@@ -6,22 +6,13 @@ localStorage.removeItem('reffie-onboarding-v2');
 
 // Auth state migration: pre-Phase-2 users have a persisted session without a token.
 // Clear it so they're forced to re-authenticate (which will capture the token).
-// Also clear expired Google ID tokens so users aren't surprised by a 401 on first action.
+// Expired tokens are left in place — apiFetch will attempt silent re-auth first.
 try {
   const raw = localStorage.getItem('reffie-auth-v1');
   if (raw) {
     const parsed = JSON.parse(raw);
     if (!parsed?.state?.token) {
       localStorage.removeItem('reffie-auth-v1');
-    } else {
-      try {
-        const payload = JSON.parse(atob(parsed.state.token.split('.')[1]));
-        if (payload.exp * 1000 < Date.now()) {
-          localStorage.removeItem('reffie-auth-v1');
-        }
-      } catch {
-        localStorage.removeItem('reffie-auth-v1');
-      }
     }
   }
 } catch {

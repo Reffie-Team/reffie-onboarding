@@ -13,6 +13,7 @@ import Login from '@/pages/Login';
 import useAuthStore from '@/store/useAuthStore';
 import useAccountStore from '@/store/useAccountStore';
 import useUpcomingDealsStore from '@/store/useUpcomingDealsStore';
+import { startRefreshTimer } from '@/lib/googleAuth';
 
 // Surfaces store errors as toasts without duplicating useEffect in every page.
 function ErrorHandler() {
@@ -49,6 +50,19 @@ function AppLayout() {
       fetchDeals();
     }
   }, [user, token]);
+
+  // Proactively refresh the Google ID token before it expires so users are
+  // never interrupted mid-session. Keyed on user (not token) so the timer
+  // survives token updates and is cleaned up on logout.
+  useEffect(() => {
+    if (!user) return;
+    return startRefreshTimer(
+      () => useAuthStore.getState().token,
+      (newToken) => {
+        useAuthStore.getState().setUser(useAuthStore.getState().user, newToken);
+      }
+    );
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-page">
