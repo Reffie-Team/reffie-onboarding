@@ -53,7 +53,7 @@ export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlo
     setOpenStages((prev) => ({ ...prev, [stage]: !prev[stage] }));
   };
 
-  const steps = generateSteps(account.ts);
+  const steps = generateSteps(account.ts, account.skippedStages ?? []);
   const { done: totalDone, total } = { done: steps.filter(s => account.cl[s.id]?.done).length, total: steps.length };
   const skippedStages = account.skippedStages ?? [];
 
